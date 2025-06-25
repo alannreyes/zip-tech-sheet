@@ -7,33 +7,23 @@ RUN apk add --no-cache python3 make g++
 # Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos de dependencias
-COPY package*.json ./
+# Copiar y construir backend primero
 COPY backend/package*.json ./backend/
-COPY frontend/package*.json ./frontend/
-
-# Instalar dependencias del workspace
-RUN npm install
-
-# Instalar dependencias del backend
 WORKDIR /app/backend
-RUN npm ci --only=production
+RUN npm ci
 
-# Instalar dependencias del frontend
+# Copiar y construir frontend
+COPY frontend/package*.json ./frontend/
 WORKDIR /app/frontend
 RUN npm ci
 
-# Volver al directorio principal
-WORKDIR /app
-
-# Copiar todo el código fuente
-COPY . .
-
-# Construir el backend
+# Copiar código fuente del backend y construir
+COPY backend/ ./backend/
 WORKDIR /app/backend
 RUN npm run build
 
-# Construir el frontend
+# Copiar código fuente del frontend y construir
+COPY frontend/ ./frontend/
 WORKDIR /app/frontend
 RUN npm run build
 
