@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - OUTPUT_DIR=/app/output
+      - DB_TYPE=${DB_TYPE:-mssql}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT:-1433}
+      - DB_ENCRYPT=${DB_ENCRYPT:-false}
+    volumes:
+      - zip_output:/app/output
+      - ${TECH_SHEETS_BASE_PATH:-./tech_sheets}:/tech_sheets:ro
+    networks:
+      - zts-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - BACKEND_URL=http://backend:3001
+    depends_on:
+      - backend
+    networks:
+      - zts-network
+    restart: unless-stopped
+
+networks:
+  zts-network:
+    driver: bridge
+
+volumes:
+  zip_output: 
