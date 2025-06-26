@@ -10,12 +10,12 @@ WORKDIR /app
 # Copiar y construir backend primero
 COPY backend/package*.json ./backend/
 WORKDIR /app/backend
-RUN npm ci
+RUN npm install
 
 # Copiar y construir frontend
 COPY frontend/package*.json ./frontend/
 WORKDIR /app/frontend
-RUN npm ci
+RUN npm install
 
 # Copiar código fuente del backend y construir
 COPY backend/ ./backend/
